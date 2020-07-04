@@ -1,0 +1,15 @@
+import dllhook
+from ctypes import *
+@dllhook.hook_dll('WeChatWin.dll', 0x329743)
+def hookmsg(ebp,edi):
+	try:
+		print("wxid:",wstring_at(cast(ebp-0x220,POINTER(c_int)).contents.value))
+		msgtype=cast(ebp-0x230,POINTER(c_int)).contents.value
+		if msgtype==1:
+			print("文字消息")
+			print(wstring_at(cast(ebp-0x1F8,POINTER(c_int)).contents.value))
+		elif msgtype==0x31:
+			print("xml 消息")
+			print(wstring_at(cast(edi,POINTER(c_int)).contents.value))
+	except Exception as e:
+		print(e)
