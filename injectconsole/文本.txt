@@ -1,15 +1,31 @@
 import dllhook
 from ctypes import *
+import re
+
+mbase=windll.kernel32.GetModuleHandleA("injectconsole.dll".encode('ascii'))
+getmoney=CDLL("injectconsole.dll").getmoney
+getmoney.restype=None
+getmoney.argtypes=[c_wchar_p,c_wchar_p]
 @dllhook.hook_dll('WeChatWin.dll', 0x329743)
 def hookmsg(ebp,edi):
 	try:
 		print("wxid:",wstring_at(cast(ebp-0x220,POINTER(c_int)).contents.value))
+		pwxid=c_wchar_p(cast(ebp-0x220,POINTER(c_int)).contents.value)
 		msgtype=cast(ebp-0x230,POINTER(c_int)).contents.value
 		if msgtype==1:
 			print("文字消息")
 			print(wstring_at(cast(ebp-0x1F8,POINTER(c_int)).contents.value))
 		elif msgtype==0x31:
 			print("xml 消息")
-			print(wstring_at(cast(edi,POINTER(c_int)).contents.value))
+			msg=wstring_at(cast(edi,POINTER(c_int)).contents.value)
+			tmp=re.findall(r'收到转账(\d+\.\d+)',msg)
+			tid=re.findall(r'<transferid><!\[CDATA\[(\d+)\]\]></transferid>',msg)
+			if tmp and tid:
+				tid=tid[0]
+				money=float(tmp[0])
+				ptid=(c_wchar_p)(tid[0])
+				getmoney(ptid,pwxid)
+				
+
 	except Exception as e:
-		print(e)
+		print(e) 
