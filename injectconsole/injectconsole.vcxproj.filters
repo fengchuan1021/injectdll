@@ -34,6 +34,7 @@
     <None Include="injectconsole.def">
       <Filter>源文件</Filter>
     </None>
+    <None Include="msg.py" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="文本.txt">

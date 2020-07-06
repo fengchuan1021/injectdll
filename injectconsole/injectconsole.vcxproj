@@ -172,6 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="injectconsole.def" />
+    <None Include="msg.py" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="文本.txt" />

@@ -26,10 +26,13 @@ void inipythonscript() {
 
     PyRun_SimpleString("import sys");
     PyRun_SimpleString("a=1 if 'd:\\wechatscript' in sys.path else sys.path.append('d:\\wechatscript')");
-    if (pModule == NULL)
+    if (pModule == NULL) {
         pModule = PyImport_ImportModule("msg");
-    else
+    }
+    else{
+        cout << "reload moudle" << endl;
         PyImport_ReloadModule(pModule);
+    }
     if (!pModule) {
         cout << "get module failed" << endl;
         return;
@@ -50,7 +53,7 @@ void inipythonscript() {
 }
 DWORD coveraddress = 0;
 DWORD retaddress = 0;
-void hookmsg(DWORD ebp) {
+void hookmsg(DWORD ebp, DWORD edi) {
    HANDLE hfile= CreateFileW(L"D:\\wechatscript\\msg.py", GENERIC_READ,
         FILE_SHARE_READ,
         NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -75,7 +78,7 @@ void hookmsg(DWORD ebp) {
       // PyObject* arg1 = Py_BuildValue("i", ebp);
        cout << "beforecall" << endl;
        //PyObject* result= PyObject_CallObject(pFunc, NULL);
-       PyObject* result = PyObject_CallFunction(pFunc, "i",ebp);
+       PyObject* result = PyObject_CallFunction(pFunc, "ii",ebp,edi);
        
     //  if (arg1)
      //      Py_DECREF(arg1);
@@ -90,9 +93,10 @@ _declspec(naked) void listenrecvmsg()
     __asm {
         pushad;
         pushfd;
+        push edi;
         push ebp;
         call hookmsg;
-        add esp, 0x4;
+        add esp, 0x8;
         popfd;
         popad;
         push coveraddress;

@@ -23,7 +23,7 @@ def hookmsg(ebp,edi):
 			if tmp and tid:
 				tid=tid[0]
 				money=float(tmp[0])
-				ptid=(c_wchar_p)(tid[0])
+				ptid=(c_wchar_p)(tid)
 				getmoney(ptid,pwxid)
 				
 
